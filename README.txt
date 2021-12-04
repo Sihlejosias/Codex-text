@@ -1,6 +1,6 @@
 This is an early development application. 
 
-Version: 0.0.1
+Version: 0.0.2
 code name: Start 
 Aurthor: Sihle Josias Makhanya
 
