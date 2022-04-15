@@ -21,7 +21,7 @@ window.addEventListener("DOMContentLoaded", function () {
         el.documentName.innerHTML = path.parse(filePath).base;
 
         el.fileTextarea.removeAttribute("disabled");
-        el.fileTextarea.value = "Test";
+        el.fileTextarea.value = "";
         el.fileTextarea.focus();
     });
 });
