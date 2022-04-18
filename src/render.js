@@ -14,7 +14,7 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     el.openbtn.addEventListener("click", function () {
-        console.log("Button clicked open");
+        ipcRenderer.send("open-document-triggered");
     });
 
     ipcRenderer.on("document-created", (_, filePath) => {
@@ -23,5 +23,17 @@ window.addEventListener("DOMContentLoaded", function () {
         el.fileTextarea.removeAttribute("disabled");
         el.fileTextarea.value = "";
         el.fileTextarea.focus();
+    });
+
+    ipcRenderer.on("document-opened", (_, {filePath, content}) => {
+        el.documentName.innerHTML = path.parse(filePath).base;
+
+        el.fileTextarea.removeAttribute("disabled");
+        el.fileTextarea.value = content;
+        el.fileTextarea.focus();
+    });
+
+    el.fileTextarea.addEventListene("input", (e) => {
+        ipcRenderer.send("file-content-updated", e.target.value)
     });
 });

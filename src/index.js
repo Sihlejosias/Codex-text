@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Notification } = require('electron');
 const path = require('path');
 const fs = require('fs')
 
@@ -9,6 +9,7 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow;
+let openedFilePath;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -29,18 +30,53 @@ const createWindow = () => {
 
 app.on('ready', createWindow);
 
+const handleError = () => {
+  new Notification({
+    title: "Error"
+    body: "Sorry, Something went wrong :("
+  }).show();
+};
+
 ipcMain.on("create-document-triggered", () => {
   dialog.showSaveDialog(mainWindow, {
     filters: [{name: "text files", extenstions: "txt"}]
   }).then(({ filePath }) => {
-    fs.writeFile(filePath,  " ", (errer) => {
-      if (errer) {
-        alert("Could not save file, please contact the developer to report bug or open an issue on github repository");
+    fs.writeFile(filePath,  " ", (error) => {
+      if (error) {
+        handleError();
       } else {
+        openedFilePath = filePath;
+
         mainWindow.webContents.send("document-created", filePath);
       };
     });
   });
+});
+
+ipcMain.on("open-document-triggered", () => {
+  dialog.showOpenDialog({
+    properties: ["openFile"],
+    filters: [{name: "text files", extenstions: "txt"}],
+  }).then(({ filePaths }) => {
+    const filePath = filePaths[0];
+    openedFilePath = filePath;
+
+    fs.readFile(filePath, "utf8", (error, content) => {
+      if(error) {
+        handleError();
+      } else {
+        mainWindow.webContents.send("document-opened", { filePath, content });
+      }
+    });
+  });
+});
+
+ipcMain.on("file-content-updated", (_, textareaContent) => {
+  fs.writeFile(openedFilePath, textareaContent, (error) => {
+    if (error) {
+      handleError();
+    }
+  })
 });
 
 app.on('window-all-closed', () => {
