@@ -1,7 +1,7 @@
 {
   "name": "polette-editor",
   "productName": "polette-editor",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A text editor app for editing text documents",
   "main": "src/index.js",
   "scripts": {

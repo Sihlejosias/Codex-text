@@ -6,7 +6,9 @@ window.addEventListener("DOMContentLoaded", function () {
         newBtn: document.getElementById("newbtn"),
         openbtn: document.getElementById("openbtn"),
         documentName: document.getElementById("documentName"),
-        fileTextarea: document.getElementById("fileTextarea"),
+        fileTextarea: document.getElementById("fileTextarea"),    
+        characCount: document.getElementById("character-count"),
+        wordCount: document.getElementById("word-count"),    
     };
 
     el.newBtn.addEventListener("click", function () {
@@ -33,7 +35,18 @@ window.addEventListener("DOMContentLoaded", function () {
         el.fileTextarea.focus();
     });
 
-    el.fileTextarea.addEventListene("input", (e) => {
-        ipcRenderer.send("file-content-updated", e.target.value)
+    // el.fileTextarea.addEventListene("input", (e) => {
+    //     ipcRenderer.send("file-content-updated", e.target.value)
+    // });
+
+    let characCount = document.getElementById("character-count");
+    let wordCount = document.getElementById("word-count");
+    let inputTextArea = document.querySelector(".input-text-area");
+
+    inputTextArea.addEventListener('input', () => {
+        characCount.textContent = inputTextArea.value.length;
+
+        let txt = inputTextArea.value.trim();
+        wordCount.textContent = txt.split(/\s+/).filter((item) => item).length;
     });
 });

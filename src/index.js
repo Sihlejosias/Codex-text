@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Notification } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs')
 
@@ -23,19 +23,59 @@ const createWindow = () => {
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  const menuTemplate = [{
+    label: "File",
+    submenu: [{
+      label: "Open",
+      click: () => ipcMain.emit("open-document-triggered"),
+    },
+    {
+      label: "New",
+      click: () => ipcMain.emit("create-document-triggered"),
+    },
+    {
+      label: "Save",
+      click: () => ipcMain.emit(""),
+    },
+    {
+      label: "Save as",
+      click: () => ipcMain.emit(""),
+    },
+    {
+      type: "separator"
+    },
+    {
+      role: "quit",
+    },
+    ],
+  }, 
+  {
+    label: "Edit",
+    submenu: [{
+      role: "undo"
+    },
+    {
+      role: "redo"
+    },
+    {
+      role: "cut"
+    },
+    {
+      role: "copy"
+    },
+    {
+      role: "paste"
+    },
+    ],
+  },
+  ];
+
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
 };
 
 
 app.on('ready', createWindow);
-
-const handleError = () => {
-  new Notification({
-    title: "Error"
-    body: "Sorry, Something went wrong :("
-  }).show();
-};
 
 ipcMain.on("create-document-triggered", () => {
   dialog.showSaveDialog(mainWindow, {
@@ -43,7 +83,7 @@ ipcMain.on("create-document-triggered", () => {
   }).then(({ filePath }) => {
     fs.writeFile(filePath,  " ", (error) => {
       if (error) {
-        handleError();
+        alert("Sorry, Couldn't create a document. Please contact the developer.");
       } else {
         openedFilePath = filePath;
 
@@ -63,7 +103,7 @@ ipcMain.on("open-document-triggered", () => {
 
     fs.readFile(filePath, "utf8", (error, content) => {
       if(error) {
-        handleError();
+        alert("Sorry, Couldn't open a document. Please contact the developer.");
       } else {
         mainWindow.webContents.send("document-opened", { filePath, content });
       }
@@ -74,7 +114,7 @@ ipcMain.on("open-document-triggered", () => {
 ipcMain.on("file-content-updated", (_, textareaContent) => {
   fs.writeFile(openedFilePath, textareaContent, (error) => {
     if (error) {
-      handleError();
+      alert("Sorry, Couldn't save a document. Please contact the developer.");
     }
   })
 });
