@@ -6,6 +6,6 @@ git clone https://github.com/sihlejosias/polette-editor.git
 
 cd polette-editor/
 
-npm init
+npm i
 
 npm start
